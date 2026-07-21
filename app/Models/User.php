@@ -2,48 +2,62 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'telephone', 'nom', 'prenom', 'numero_cni', 'date_naissance', 'ville',
+        'cni_recto_url', 'cni_verso_url', 'selfie_url', 'statut_verification',
+        'mot_de_passe',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'mot_de_passe', 'numero_cni', 'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'numero_cni' => 'encrypted', // chiffré au repos (§4.1)
+            'date_naissance' => 'date',
+            'telephone_verifie_at' => 'datetime',
         ];
+    }
+
+    // Laravel utilise "password" pour l'auth par défaut ; on l'aliase sur mot_de_passe.
+    public function getAuthPassword(): string
+    {
+        return $this->mot_de_passe;
+    }
+
+    public function estVerifie(): bool
+    {
+        return $this->statut_verification === 'verifie';
+    }
+
+    public function contratsEnTantQuePreteur(): HasMany
+    {
+        return $this->hasMany(Contrat::class, 'preteur_id');
+    }
+
+    public function contratsEnTantQuEmprunteur(): HasMany
+    {
+        return $this->hasMany(Contrat::class, 'emprunteur_id');
+    }
+
+    public function accessCodes(): HasMany
+    {
+        return $this->hasMany(AccessCode::class);
+    }
+
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(Signature::class);
     }
 }
