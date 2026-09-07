@@ -37,9 +37,17 @@ return [
 
     'sms' => [
         'driver' => env('SMS_DRIVER', 'log'),
-        'api_key' => env('SMS_API_KEY'),
-        'api_secret' => env('SMS_API_SECRET'),
-        'sender_id' => env('SMS_SENDER_ID', 'FAYKO'),
+        'africastalking' => [
+            'username' => env('AFRICASTALKING_USERNAME', 'sandbox'),
+            'api_key' => env('AFRICASTALKING_API_KEY'),
+            'sender_id' => env('AFRICASTALKING_SENDER_ID'),
+        ],
     ],
 
+    'mobile_money' => [
+        'aggregator' => env('MOBILE_MONEY_AGGREGATOR', 'simulation'),
+        'api_key' => env('MOBILE_MONEY_API_KEY'),
+        'api_secret' => env('MOBILE_MONEY_API_SECRET'),
+        'callback_secret' => env('MOBILE_MONEY_CALLBACK_SECRET'),
+    ],
 ];

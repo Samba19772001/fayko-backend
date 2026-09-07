@@ -8,7 +8,7 @@ use App\Models\Paiement;
 use App\Services\MobileMoneyService;
 use Illuminate\Http\Request;
 
-// Cahier des charges §3.4 - Paiement des frais de 200 FCFA une fois le
+// Cahier des charges §3.4 - Paiement des frais de 500 FCFA une fois le
 // contrat doublement signé.
 class PaiementController extends Controller
 {

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use AfricasTalking\SDK\AfricasTalking;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +15,10 @@ use Illuminate\Support\Facades\Log;
  *  - §3.1 : inscription / connexion
  *  - §3.5 : confirmation de signature électronique
  *
- * L'envoi SMS est abstrait derrière SMS_DRIVER (config/services.php) afin de
- * pouvoir brancher Twilio / Vonage / Orange SMS / etc. sans toucher au reste
- * de l'application. En développement (SMS_DRIVER=log), le code est simplement
- * journalisé au lieu d'être envoyé.
+ * L'envoi SMS est abstrait derrière SMS_DRIVER (config/services.php) :
+ *  - 'log' (dev) : le code est journalisé au lieu d'être envoyé.
+ *  - 'africastalking' : envoi réel via Africa's Talking. Utilise le
+ *    compte sandbox tant que le Sender ID de production n'est pas validé.
  */
 class OtpService
 {
@@ -43,7 +44,7 @@ class OtpService
         $entree = Cache::get($cleCache);
 
         if (! $entree) {
-            return false; // expiré ou jamais généré
+            return false;
         }
 
         if ($entree['tentatives'] >= self::MAX_TENTATIVES) {
@@ -57,7 +58,7 @@ class OtpService
             return false;
         }
 
-        Cache::forget($cleCache); // usage unique
+        Cache::forget($cleCache);
         return true;
     }
 
@@ -75,8 +76,53 @@ class OtpService
             return;
         }
 
-        // TODO brancher le vrai fournisseur SMS ici (Twilio, Vonage, Orange SMS...)
-        // en lisant SMS_API_KEY / SMS_API_SECRET / SMS_SENDER_ID depuis la config.
+        if ($driver === 'africastalking') {
+            $this->envoyerViaAfricasTalking($telephone, $message);
+            return;
+        }
+
         throw new \RuntimeException("Fournisseur SMS '{$driver}' non implémenté.");
+    }
+
+    private function envoyerViaAfricasTalking(string $telephone, string $message): void
+    {
+        $config = config('services.sms.africastalking');
+
+        $AT = new AfricasTalking($config['username'], $config['api_key']);
+        $sms = $AT->sms();
+
+        // Africa's Talking exige le format international complet (+221...).
+        $numeroInternational = $this->formaterNumeroInternational($telephone);
+
+        try {
+            $resultat = $sms->send([
+                'to' => $numeroInternational,
+                'message' => $message,
+                'from' => $config['sender_id'] ?: null,
+            ]);
+            Log::info('SMS envoyé via Africa\'s Talking', ['to' => $numeroInternational, 'reponse' => $resultat]);
+        } catch (\Throwable $e) {
+            // On journalise l'échec mais on ne bloque pas l'utilisateur : une
+            // erreur d'envoi ne doit jamais empêcher la génération du code
+            // (ex. le code reste valide en base même si le SMS échoue).
+            Log::error('Échec envoi SMS Africa\'s Talking', ['to' => $numeroInternational, 'erreur' => $e->getMessage()]);
+            throw new \RuntimeException("L'envoi du SMS a échoué. Réessayez dans quelques instants.");
+        }
+    }
+
+    /**
+     * Convertit un numéro local (ex. 770000001) au format international
+     * attendu par Africa's Talking (+221770000001). Le Sénégal utilise
+     * l'indicatif +221.
+     */
+    private function formaterNumeroInternational(string $telephone): string
+    {
+        $telephone = preg_replace('/\D/', '', $telephone); // ne garde que les chiffres
+
+        if (str_starts_with($telephone, '221')) {
+            return '+' . $telephone;
+        }
+
+        return '+221' . $telephone;
     }
 }

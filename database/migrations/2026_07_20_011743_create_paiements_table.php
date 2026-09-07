@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contrat_id')->constrained('contrats')->cascadeOnDelete();
-            $table->decimal('montant', 10, 2)->default(200); // 200 FCFA
+            $table->decimal('montant', 10, 2)->default(500); // 500 FCFA
             $table->enum('operateur', ['wave', 'orange_money', 'free_money']);
             $table->string('reference_transaction')->nullable();
             $table->enum('statut', ['en_attente', 'reussi', 'echoue'])->default('en_attente');

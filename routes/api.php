@@ -9,8 +9,11 @@ use App\Http\Controllers\Api\SignatureController;
 use Illuminate\Support\Facades\Route;
 
 // --- Authentification (§3.1) — public ---
-Route::post('/auth/demander-code', [AuthController::class, 'demanderCode']);
-Route::post('/auth/verifier-code', [AuthController::class, 'verifierCode']);
+// Inscription en deux étapes (OTP pour prouver le numéro, puis mot de passe).
+Route::post('/auth/inscription/demander-code', [AuthController::class, 'inscriptionDemanderCode']);
+Route::post('/auth/inscription/definir-mot-de-passe', [AuthController::class, 'inscriptionDefinirMotDePasse']);
+// Connexion standard, sans OTP.
+Route::post('/auth/connexion', [AuthController::class, 'connexion']);
 
 // --- Webhook mobile money (§3.4) — public, sécurisé par signature interne ---
 Route::post('/paiements/webhook', [PaiementController::class, 'webhook']);
