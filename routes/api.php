@@ -21,6 +21,7 @@ Route::post('/paiements/webhook', [PaiementController::class, 'webhook']);
 // --- Routes protégées (jeton Sanctum requis) ---
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/completer-profil', [AuthController::class, 'completerProfil']);
+    Route::post('/auth/verification-identite', [\App\Http\Controllers\Api\IdentityVerificationController::class, 'upload']);
     Route::get('/auth/moi', [AuthController::class, 'moi']);
     Route::post('/auth/deconnexion', [AuthController::class, 'deconnexion']);
 

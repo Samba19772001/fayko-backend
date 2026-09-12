@@ -24,13 +24,13 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'numero_cni' => 'encrypted', // chiffré au repos (§4.1)
+            'numero_cni' => 'encrypted',
             'date_naissance' => 'date',
             'telephone_verifie_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
     }
 
-    // Laravel utilise "password" pour l'auth par défaut ; on l'aliase sur mot_de_passe.
     public function getAuthPassword(): string
     {
         return $this->mot_de_passe;
@@ -39,6 +39,11 @@ class User extends Authenticatable
     public function estVerifie(): bool
     {
         return $this->statut_verification === 'verifie';
+    }
+
+    public function estEnAttenteDeVerification(): bool
+    {
+        return $this->statut_verification === 'en_attente';
     }
 
     public function contratsEnTantQuePreteur(): HasMany
