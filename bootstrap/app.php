@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // n'a pas été vérifiée (§3.2 du cahier des charges).
         $middleware->alias([
             'verifie' => \App\Http\Middleware\EnsureUserVerified::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
