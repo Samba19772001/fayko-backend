@@ -20,11 +20,13 @@ class RemboursementController extends Controller
 
         $data = $request->validate([
             'montant' => ['required', 'numeric', 'min:1'],
+            'reference_transaction' => ['required', 'string', 'max:100'],
         ]);
 
         $remboursement = Remboursement::create([
             'contrat_id' => $contrat->id,
             'montant' => $data['montant'],
+            'reference_transaction' => $data['reference_transaction'],
             'declare_par' => $request->user()->id,
             'statut_confirmation' => 'en_attente',
             'date_declaration' => now(),

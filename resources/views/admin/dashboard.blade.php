@@ -37,11 +37,10 @@
                 <div class="grid grid-cols-2 gap-4 mb-5">
                     <div>
                         <p class="text-xs font-semibold text-slate-500 mb-2">CNI — Recto</p>
-                        <img src="{{ $user->cni_recto_url }}" class="rounded-lg border border-slate-200 w-full object-cover" style="max-height: 220px;">
-                    </div>
+                        <img src="{{ Storage::disk('public')->url($user->cni_recto_url) }}" class="rounded-lg border border-slate-200 w-full object-cover" style="max-height: 220px;">
                     <div>
                         <p class="text-xs font-semibold text-slate-500 mb-2">CNI — Verso</p>
-                        <img src="{{ $user->cni_verso_url }}" class="rounded-lg border border-slate-200 w-full object-cover" style="max-height: 220px;">
+                        <img src="{{ Storage::disk('public')->url($user->cni_verso_url) }}" class="rounded-lg border border-slate-200 w-full object-cover" style="max-height: 220px;">
                     </div>
                 </div>
 

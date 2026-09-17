@@ -34,7 +34,7 @@ class ContratController extends Controller
             'date_echeance' => ['required', 'date', 'after:date_remise_fonds'],
             'taux_interet' => ['nullable', 'numeric', 'min:0'],
             'garanties' => ['nullable', 'string'],
-            'mode_remboursement' => ['required', 'in:especes,mobile_money,virement'],
+            'mode_remboursement' => ['required', 'in:mobile_money,virement'],
         ]);
 
         // Rappel : la route sera protégée par le middleware 'verifie', donc en
@@ -79,7 +79,7 @@ class ContratController extends Controller
         $this->autoriserAcces($request, $contrat);
 
         return response()->json(
-            $contrat->load(['preteur', 'emprunteur', 'signatures.signataire', 'paiements'])
+            $contrat->load(['preteur', 'emprunteur', 'signatures.signataire', 'paiements', 'remboursements'])
         );
     }
 
