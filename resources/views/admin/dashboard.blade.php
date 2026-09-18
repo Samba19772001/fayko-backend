@@ -7,7 +7,11 @@
 </head>
 <body class="bg-slate-100 min-h-screen">
     <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <h1 class="text-lg font-semibold text-slate-800">Fayko — Vérifications d'identité</h1>
+        <div class="flex items-center gap-6">
+            <h1 class="text-lg font-semibold text-slate-800">Fayko — Vérifications d'identité</h1>
+            <a href="{{ route('admin.litiges.index') }}" class="text-sm text-slate-500 hover:text-slate-800">Litiges</a>
+            <a href="{{ route('admin.statistiques') }}" class="text-sm text-slate-500 hover:text-slate-800">Statistiques</a>
+        </div>
         <form method="POST" action="{{ route('admin.logout') }}">
             @csrf
             <button type="submit" class="text-sm text-slate-500 hover:text-slate-800">Se déconnecter</button>

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Remboursement extends Model
 {
     protected $fillable = [
-        'contrat_id', 'montant', 'reference_transaction', 'declare_par', 'statut_confirmation', 'date_declaration',
+        'contrat_id', 'montant', 'reference_transaction', 'declare_par',
+        'statut_confirmation', 'motif_admin', 'date_declaration',
     ];
 
     protected function casts(): array

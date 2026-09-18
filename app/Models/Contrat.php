@@ -74,6 +74,32 @@ class Contrat extends Model
         return bccomp((string) $totalConfirme, (string) $this->montant, 2) >= 0;
     }
 
+        /**
+     * Recalcule le statut réel du contrat à partir de ses faits (montant
+     * remboursé, échéance). Utilisé après qu'un admin tranche un litige :
+     * le contrat ne reste jamais bloqué en "litige" une fois la décision
+     * prise, il retrouve le statut que sa situation réelle justifie.
+     */
+    public function recalculerStatut(): void
+    {
+        if ($this->estEntierementRembourse()) {
+            $this->update(['statut' => 'solde']);
+            return;
+        }
+
+        $joursDeGrace = config('fayko.retard_impaye_jours');
+        $echeanceDepassee = $this->date_echeance->isPast();
+        $enImpaye = $this->date_echeance->addDays($joursDeGrace)->isPast();
+
+        if ($enImpaye) {
+            $this->update(['statut' => 'impaye']);
+        } elseif ($echeanceDepassee) {
+            $this->update(['statut' => 'en_retard']);
+        } else {
+            $this->update(['statut' => 'actif']);
+        }
+    }
+
     public function scopeEnRetardNonSignale(Builder $query): Builder
     {
         return $query->where('statut', 'actif')

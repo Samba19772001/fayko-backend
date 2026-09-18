@@ -16,4 +16,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [VerificationController::class, 'index'])->name('dashboard');
     Route::post('/verifications/{user}/valider', [VerificationController::class, 'valider'])->name('verifications.valider');
     Route::post('/verifications/{user}/rejeter', [VerificationController::class, 'rejeter'])->name('verifications.rejeter');
+    Route::get('/litiges', [\App\Http\Controllers\Admin\LitigeController::class, 'index'])->name('litiges.index');
+    Route::post('/litiges/{remboursement}/valider', [\App\Http\Controllers\Admin\LitigeController::class, 'valider'])->name('litiges.valider');
+    Route::post('/litiges/{remboursement}/rejeter', [\App\Http\Controllers\Admin\LitigeController::class, 'rejeter'])->name('litiges.rejeter');
+    Route::get('/statistiques', [\App\Http\Controllers\Admin\StatistiqueController::class, 'index'])->name('statistiques');
 });
