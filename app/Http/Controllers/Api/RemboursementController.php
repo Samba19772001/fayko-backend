@@ -98,4 +98,42 @@ class RemboursementController extends Controller
             'Vous ne pouvez pas confirmer ou contester votre propre déclaration.'
         );
     }
+
+        /**
+     * Permet à celui qui a contesté un remboursement de retirer sa
+     * contestation — par exemple si le désaccord s'est réglé en dehors de
+     * l'app. Fayko ne juge jamais qui avait raison : seule la personne à
+     * l'origine de la contestation peut la retirer, et le remboursement
+     * revient simplement en attente de confirmation normale.
+     */
+    public function retirerContestation(Request $request, Remboursement $remboursement)
+    {
+        $contrat = $remboursement->contrat;
+
+        abort_unless(
+            in_array($request->user()->id, [$contrat->preteur_id, $contrat->emprunteur_id]),
+            403,
+            "Vous n'êtes pas partie à ce contrat."
+        );
+
+        if ($remboursement->statut_confirmation !== 'conteste') {
+            return response()->json(['message' => "Ce remboursement n'est pas contesté."], 422);
+        }
+
+        // Seul l'auteur de la contestation peut la retirer. On le retrouve
+        // en cherchant qui N'EST PAS le déclarant parmi les deux parties.
+        $contestataireId = $contrat->preteur_id === $remboursement->declare_par
+            ? $contrat->emprunteur_id
+            : $contrat->preteur_id;
+
+        abort_unless($request->user()->id === $contestataireId, 403, "Seule la personne ayant contesté peut retirer sa contestation.");
+
+        $remboursement->update(['statut_confirmation' => 'en_attente']);
+        $contrat->recalculerStatut();
+
+        return response()->json([
+            'remboursement' => $remboursement->fresh(),
+            'contrat' => $contrat->fresh(),
+        ]);
+    }
 }

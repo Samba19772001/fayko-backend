@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/contrats/{contrat}/remboursements', [RemboursementController::class, 'declarer']);
     Route::post('/remboursements/{remboursement}/confirmer', [RemboursementController::class, 'confirmer']);
     Route::post('/remboursements/{remboursement}/contester', [RemboursementController::class, 'contester']);
+    Route::post('/remboursements/{remboursement}/retirer-contestation', [RemboursementController::class, 'retirerContestation']);
 
     // Solvabilité (§3.7)
     Route::post('/solvabilite/generer-code', [AccessCodeController::class, 'generer']);

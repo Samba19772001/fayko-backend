@@ -10,7 +10,7 @@
         <div class="flex items-center gap-6">
             <h1 class="text-lg font-semibold text-slate-800">Fayko — Statistiques</h1>
             <a href="{{ route('admin.dashboard') }}" class="text-sm text-slate-500 hover:text-slate-800">Vérifications d'identité</a>
-            <a href="{{ route('admin.litiges.index') }}" class="text-sm text-slate-500 hover:text-slate-800">Litiges</a>
+            
         </div>
         <form method="POST" action="{{ route('admin.logout') }}">
             @csrf
